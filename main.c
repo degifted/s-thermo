@@ -37,6 +37,10 @@
 #include "ds18b20.h"
 #include "pid.h"
 
+
+#define TRIAC_MODULATOR_RESOLUTION  200
+
+
 #define buzzer_toggle() PORTB ^= _BV(1)
 #define buzzer_off()    PORTB &= ~_BV(1)
 #define beeper_on()     TCCR2 |= (1 << CS21)
@@ -76,12 +80,12 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
-    powerDebt += 200 - currPower;
+    powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (powerDebt < 0)
         powerDebt = 0;
     if (currPower > 0){
-        if (powerDebt > 199){
-            powerDebt -= 200;
+        if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
+            powerDebt -= TRIAC_MODULATOR_RESOLUTION;
             heater_off();
         }else{
             heater_on();
@@ -104,7 +108,7 @@ ISR(INT1_vect)
             targetTemp--;
     } else {
         if (msg == (char*)"M"){
-            if (currPower < 200){
+            if (currPower < TRIAC_MODULATOR_RESOLUTION){
                 heater_power(currPower + 1);
             }
         } else if (targetTemp < 99)
@@ -259,8 +263,8 @@ int main(void)
         } else if (!secondsElapsed && (msg == (char*)"")){
             secondsElapsed = 1;
         }
-        if ((currPower >= 0) && (currPower < 201) && (msg != (char*)"M")){
-            heater_power(pid_update(currTemp, targetTemp));
+        if ((currPower >= 0) && (currPower <= TRIAC_MODULATOR_RESOLUTION) && (msg != (char*)"M")){
+            heater_power(pid_update(currTemp, targetTemp) * TRIAC_MODULATOR_RESOLUTION);
         }
 
         updateLCD();

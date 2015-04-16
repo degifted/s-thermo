@@ -28,9 +28,9 @@
 #include <math.h>
 #include "pid.h"
 
-const float k_p   = 2.3;
-const float k_i   = 0.009;
-const float k_d   = 35;
+const float k_p   = 0.0115;
+const float k_i   = 0.000045;
+const float k_d   = 0.175;
 #define k_delay 50
 
 float pid_prev[k_delay];
@@ -77,13 +77,13 @@ float pid_update(float temp, float target)
     //printf("p=%f, i=%f, d=%f, error=%f\n", error      * k_p, pid_int    * k_i, derivative * k_d, error);
 
     // only update integral if output is not saturated (or if change would reduce saturation)
-    if( (command >= 0 && command <= 200) || (command > 0 && error < 0) || (command < 0 && error > 0) )
+    if( (command >= 0 && command <= 1) || (command > 0 && error < 0) || (command < 0 && error > 0) )
         pid_int     += error;
 
     if(command < 0)
         command     = 0;
-    else if(command > 200)
-        command     = 200;
+    else if(command > 1)
+        command     = 1;
 
     return command;
 }
