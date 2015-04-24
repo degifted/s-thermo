@@ -614,9 +614,9 @@ build elf hex eep lss sym coff extcoff \
 clean clean_list program debug gdb-config
 
 GITREV = $(GIT) rev-parse --short=8 HEAD | xargs echo -n
-AUTOCOMMIT = $(GIT) commit -am "auto commit by make" 
+AUTOCOMMIT = $(GIT) commit -am "auto commit by make"
 
 gitversion:
-	-@$(AUTOCOMMIT)
+	if $(AUTOCOMMIT)
 	@echo -ne "#define GIT_VERSION     \"" > version.h; $(GITREV) >> version.h; echo "\"" >> version.h
 
