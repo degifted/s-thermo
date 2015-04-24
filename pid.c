@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2015, Dmitriy Gorokh
- * Based on implementation of Daniel Strother < http://danstrother.com/ >
+ * Inspired by implementation of Daniel Strother < http://danstrother.com/ >
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
