@@ -28,11 +28,12 @@
                                                             // 100 means that power can be
                                                             // regulated in 1% steps.
 #define     PREHEAT_ENERGY                      800         // Amount of energy for preheat
-                                                            // per each degree of an error
-#define     PID_P                               6           // PID proportional coefficient
-#define     PID_I                               0.014       // PID integral coefficient
-#define     PID_D                               24          // PID derivative coefficient
-#define     PID_A                               100         // PID output attenuation (a reciprocal to gain)
+                                                            // per each degree of an error.
+                                                            // 800 means 8 seconds of full power per each degree.
+#define     PID_P                               6           // PID proportional coefficient.
+#define     PID_I                               0.014       // PID integral coefficient.
+#define     PID_D                               24          // PID derivative coefficient.
+#define     PID_A                               100         // PID output attenuation (a reciprocal to gain).
 #define     PID_D_INTERVAL                      160         // PID time interval on which a derivative
                                                             // is calculated. 160 × 0.76 ÷ 60 = 2 minutes
 #define     PID_I_P_LIMIT                       350         // Upper and lower limits of the integral and
@@ -40,13 +41,13 @@
 #define     PID_D_P_LIMIT                       1           // the corresponding value is saturated.
 #define     PID_D_N_LIMIT                      -4           
 #define     PID_INTEGRATOR_BAND                 2           // PID error boundaries inside which the
-                                                            // integrator starts working
+                                                            // integrator starts working.
 #define     PID_UPPER_REGULATION_LIMIT          1           // PID maximum negative error, beyond which
-                                                            // the PID regulator is switched off (abnormal situation)
+                                                            // the PID regulator is switched off (abnormal situation).
 #define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10          // Maximum allowed speed of temperature change.
                                                             // If the temperature is changing too fast,
-                                                            // there is something wrong with the setup
+                                                            // there is something wrong with the setup.
 #define     MAXIMUM_TEMPERATURE                 99
-#define     MINIMUM_TEMPERATURE                 20          // Temperature limits for the set point
+#define     MINIMUM_TEMPERATURE                 20          // Temperature limits for the set point.
 #define     MAXIMUM_ALLOWED_OVERHEAT            5           // If the temperature goes beyond that limit,
-                                                            // the regulation process must be aborted
+                                                            // the regulation process must be aborted.
