@@ -544,7 +544,7 @@ extcoff: $(TARGET).elf
 
 
 # Compile: create object files from C source files.
-$(OBJDIR)/%.o : %.c version.h
+$(OBJDIR)/%.o : %.c | gitversion
 	@echo
 	@echo $(MSG_COMPILING) $<
 	$(CC) -c $(ALL_CFLAGS) $< -o $@ 
@@ -617,6 +617,6 @@ clean clean_list program debug gdb-config
 GITREV = $(GIT) rev-parse --short=8 HEAD | xargs echo -n
 AUTOCOMMIT = $(GIT) commit -am "auto commit by make" > /dev/null
 
-version.h:
+gitversion:
 	@if $(AUTOCOMMIT); then echo -ne "#define GIT_VERSION     \"" > version.h; $(GITREV) >> version.h; echo "\"" >> version.h; fi
 
