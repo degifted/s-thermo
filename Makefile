@@ -619,3 +619,4 @@ AUTOCOMMIT = $(GIT) commit -am "auto commit by make"
 gitversion:
 	-@$(AUTOCOMMIT)
 	@echo -ne "#define GIT_VERSION     \"" > version.h; $(GITREV) >> version.h; echo "\"" >> version.h
+
