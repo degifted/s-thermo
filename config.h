@@ -24,20 +24,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define     TRIAC_MODULATOR_RESOLUTION          100
-#define     PREHEAT_ENERGY                      800 // amount of energy for preheat per each degree of an error
-#define     PID_P                               6//2.6//0.026
-#define     PID_I                               0.014//0.014//0.00012
-#define     PID_D                               24//25//0.16
-#define     PID_A                               100
-#define     PID_D_WINDOW                        160//160 // 160 = 2 minutes
-#define     PID_I_P_LIMIT                       350
-#define     PID_I_N_LIMIT                      -350
-#define     PID_D_P_LIMIT                       1
-#define     PID_D_N_LIMIT                      -4
-#define     PID_INTEGRATOR_BAND                 2
-#define     PID_UPPER_REGULATION_LIMIT          1
-#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10
+#define     TRIAC_MODULATOR_RESOLUTION          100         // Resolution of the triac modulator
+                                                            // 100 means that power can be
+                                                            // regulated in 1% steps.
+#define     PREHEAT_ENERGY                      800         // Amount of energy for preheat
+                                                            // per each degree of an error
+#define     PID_P                               6           // PID proportional coefficient
+#define     PID_I                               0.014       // PID integral coefficient
+#define     PID_D                               24          // PID derivative coefficient
+#define     PID_A                               100         // PID output attenuation (a reciprocal to gain)
+#define     PID_D_INTERVAL                      160         // PID time interval on which a derivative
+                                                            // is calculated. 160 × 0.76 ÷ 60 = 2 minutes
+#define     PID_I_P_LIMIT                       350         // Upper and lower limits of the integral and
+#define     PID_I_N_LIMIT                      -350         // derivative components. Beyond these limits
+#define     PID_D_P_LIMIT                       1           // the corresponding value is saturated.
+#define     PID_D_N_LIMIT                      -4           
+#define     PID_INTEGRATOR_BAND                 2           // PID error boundaries inside which the
+                                                            // integrator starts working
+#define     PID_UPPER_REGULATION_LIMIT          1           // PID maximum negative error, beyond which
+                                                            // the PID regulator is switched off (abnormal situation)
+#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10          // Maximum allowed speed of temperature change.
+                                                            // If the temperature is changing too fast,
+                                                            // there is something wrong with the setup
 #define     MAXIMUM_TEMPERATURE                 99
-#define     MINIMUM_TEMPERATURE                 20
-#define     MAXIMUM_ALLOWED_OVERHEAT            5
+#define     MINIMUM_TEMPERATURE                 20          // Temperature limits for the set point
+#define     MAXIMUM_ALLOWED_OVERHEAT            5           // If the temperature goes beyond that limit,
+                                                            // the regulation process must be aborted

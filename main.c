@@ -77,12 +77,10 @@ uint8_t EEMEM           NonVolatileTargetTemp = 57;
 
 
 void updateLCD(void){
-
     sprintf(lcdBuf[0], "%dC%3d.%d",
         targetTemp,
         (int)currTemp,
         (int)((float)(currTemp - (int)currTemp) * 10));
-
 
     switch (currState){
         case STATE_MANUAL:

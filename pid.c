@@ -29,7 +29,7 @@
 #include "pid.h"
 #include "config.h"
 
-float delayLine[PID_D_WINDOW];
+float delayLine[PID_D_INTERVAL];
 float integral;
 float prevTemp;
 uint8_t delayLineHeadIdx;
@@ -40,7 +40,7 @@ float getDelayedValue(float prev)
     delayLine[delayLineHeadIdx] = prev;
 
     delayLineHeadIdx++;
-    if(delayLineHeadIdx >= PID_D_WINDOW)
+    if(delayLineHeadIdx >= PID_D_INTERVAL)
         delayLineHeadIdx = 0;
 
     return popped;
@@ -50,7 +50,7 @@ void resetPID(float temp)
 {
     uint8_t i;
     
-    for(i = 0; i < PID_D_WINDOW; i++)
+    for(i = 0; i < PID_D_INTERVAL; i++)
         delayLine[i] = temp;
 
     integral = 0;
