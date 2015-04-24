@@ -617,6 +617,5 @@ GITREV = $(GIT) rev-parse --short=8 HEAD | xargs echo -n
 AUTOCOMMIT = $(GIT) commit -am "auto commit by make"
 
 gitversion:
-	if $(AUTOCOMMIT)
-	@echo -ne "#define GIT_VERSION     \"" > version.h; $(GITREV) >> version.h; echo "\"" >> version.h
+	if $(AUTOCOMMIT); then echo -ne "#define GIT_VERSION     \"" > version.h; $(GITREV) >> version.h; echo "\"" >> version.h; fi
 
