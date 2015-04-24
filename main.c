@@ -166,18 +166,8 @@ ISR(INT1_vect)
 // Beeper
 ISR (TIMER2_COMP_vect)
 {
-    cnt2++;
-    if (cnt2 & (1 << 10))
+    if (cnt2++ & (1 << 10))
         buzzerToggle();
-
-/*
-    cnt3++;
-    if (cnt2 == 10){
-        cnt2 = 0;
-        if (cnt3 & (1 << 12))
-            buzzerToggle();
-    }
-*/
 }
 
 // Realtime clock
