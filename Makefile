@@ -613,6 +613,9 @@ $(shell mkdir $(OBJDIR) 2>/dev/null)
 build elf hex eep lss sym coff extcoff \
 clean clean_list program debug gdb-config
 
-gitversion:	version.h
-	$(shell git commit -am "auto commit by make")
-	@echo -ne "#define GIT_VERSION     \"$$(git rev-parse --short=8 HEAD)\""> version.h
+GITREV=$(GIT) rev-parse --short=8 HEAD
+AUTOCOMMIT=$(GIT) commit -am "auto commit by make"
+
+gitversion:
+	@$(AUTOCOMMIT)
+	@echo -ne "#define GIT_VERSION     \"$(GITREV)\""> version.h
