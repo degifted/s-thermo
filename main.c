@@ -39,17 +39,17 @@
 #include "config.h"
 #include "version.h"
 
-#define buzzerToggle() PORTB ^= _BV(1)
-#define buzzerOff()    PORTB &= ~_BV(1)
-#define beeperOn()     TCCR2 |= (1 << CS21)
-#define beeperOff()    TCCR2 &= ~(1 << CS21); \
-                       buzzerOff()
-#define heaterOn()     PORTD |= _BV(0)
-#define heaterOff()    PORTD &= ~_BV(0)
-#define heaterPower(p) currPower = (p)
-#define button()       !(PIND & (1<<PD5))
-#define encA()         !(PIND & (1<<PD3))
-#define encB()         !(PIND & (1<<PD4))
+#define buzzerToggle()  PORTB ^= _BV(1)
+#define buzzerOff()     PORTB &= ~_BV(1)
+#define beeperOn()      TCCR2 |= (1 << CS21)
+#define beeperOff()     TCCR2 &= ~(1 << CS21); \
+                        buzzerOff()
+#define heaterOn()      PORTD |= _BV(0)
+#define heaterOff()     PORTD &= ~_BV(0)
+#define heaterPower(p)  currPower = (p)
+#define button()        !(PIND & (1<<PD5))
+#define encA()          !(PIND & (1<<PD3))
+#define encB()          !(PIND & (1<<PD4))
 
 typedef enum {          STATE_OFF,
                         STATE_AUTO,
@@ -168,12 +168,17 @@ ISR(INT1_vect)
 ISR (TIMER2_COMP_vect)
 {
     cnt2++;
+    if (cnt2 & (1 << 12))
+        buzzerToggle();
+
+/*
     cnt3++;
     if (cnt2 == 10){
         cnt2 = 0;
         if (cnt3 & (1 << 12))
             buzzerToggle();
     }
+*/
 }
 
 // Realtime clock
@@ -248,7 +253,7 @@ int main(void)
     TIMSK |= (1 << OCIE1A);
     TCCR1B |= (1 << CS11); 
 
-    OCR2 = 25;
+    OCR2 = 250;
     TCCR2 |= (1 << WGM21);
     TIMSK |= (1 << OCIE2);
 
