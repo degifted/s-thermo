@@ -46,8 +46,7 @@
                        buzzerOff()
 #define heaterOn()     PORTD |= _BV(0)
 #define heaterOff()    PORTD &= ~_BV(0)
-#define heaterPower(p) /*powerDebt = 0;*/ \
-                       currPower = (p)
+#define heaterPower(p) currPower = (p)
 #define button()       !(PIND & (1<<PD5))
 #define encA()         !(PIND & (1<<PD3))
 #define encB()         !(PIND & (1<<PD4))
@@ -108,7 +107,7 @@ void updateLCD(void){
             break;
 
         case STATE_FAILURE:
-            sprintf(lcdBuf[1], "FAILURE");
+            sprintf(lcdBuf[1], "FAILURE ");
             break;
 
         case STATE_OFF:
@@ -128,8 +127,6 @@ void updateLCD(void){
 ISR (INT0_vect)
 {
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
-    /*if (powerDebt < 0)
-        powerDebt = 0;*/
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
             powerDebt -= TRIAC_MODULATOR_RESOLUTION;

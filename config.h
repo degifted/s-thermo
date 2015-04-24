@@ -25,12 +25,12 @@
  */
 
 #define     TRIAC_MODULATOR_RESOLUTION          100
-#define     PREHEAT_ENERGY                      600
+#define     PREHEAT_ENERGY                      800 // amount of energy for preheat per each degree of an error
 #define     PID_P                               6//2.6//0.026
 #define     PID_I                               0.014//0.014//0.00012
-#define     PID_D                               23//25//0.16
+#define     PID_D                               24//25//0.16
 #define     PID_A                               100
-#define     PID_D_WINDOW                        80//160
+#define     PID_D_WINDOW                        160//160 // 160 = 2 minutes
 #define     PID_I_P_LIMIT                       350
 #define     PID_I_N_LIMIT                      -350
 #define     PID_D_P_LIMIT                       1

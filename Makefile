@@ -393,7 +393,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 all: begin gccversion sizebefore build sizeafter end
 
 # Change the build target to build a HEX file or a library.
-build: gitversion elf hex eep lss sym
+build: elf hex eep lss sym
 #build: lib
 
 
@@ -544,7 +544,7 @@ extcoff: $(TARGET).elf
 
 
 # Compile: create object files from C source files.
-$(OBJDIR)/%.o : %.c
+$(OBJDIR)/%.o : %.c gitversion
 	@echo
 	@echo $(MSG_COMPILING) $<
 	$(CC) -c $(ALL_CFLAGS) $< -o $@ 
