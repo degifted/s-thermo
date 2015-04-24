@@ -247,11 +247,8 @@ int main(void)
     TIMSK |= (1 << OCIE2);
 
     wdt_enable(WDTO_2S);
-
     lcd_init(LCD_DISP_ON);
-
     targetTemp = eeprom_read_byte(&NonVolatileTargetTemp);
-
     sei();
 
     while (1) {
