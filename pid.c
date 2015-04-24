@@ -96,7 +96,7 @@ int updatePID(float temp, float target)
     output = (error       * PID_P
             + integral    * PID_I
             + derivative  * PID_D)
-                          / (PID_A / TRIAC_MODULATOR_RESOLUTION); 
+                          / (PID_A / TRIAC_MODULATOR_RESOLUTION);
 
     // apply output clipping
     output = output < 0 ? 0 : output;
