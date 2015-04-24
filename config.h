@@ -25,6 +25,7 @@
  */
 
 #define     TRIAC_MODULATOR_RESOLUTION          100
+#define     PREHEAT_ENERGY                      600
 #define     PID_P                               6//2.6//0.026
 #define     PID_I                               0.014//0.014//0.00012
 #define     PID_D                               23//25//0.16
@@ -36,7 +37,6 @@
 #define     PID_D_N_LIMIT                      -4
 #define     PID_INTEGRATOR_BAND                 2
 #define     PID_UPPER_REGULATION_LIMIT          1
-#define     PREHEAT_OVERSHOT                    10
 #define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10
 #define     MAXIMUM_TEMPERATURE                 99
 #define     MINIMUM_TEMPERATURE                 20

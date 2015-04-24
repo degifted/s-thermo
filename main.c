@@ -46,7 +46,7 @@
                        buzzerOff()
 #define heaterOn()     PORTD |= _BV(0)
 #define heaterOff()    PORTD &= ~_BV(0)
-#define heaterPower(p) powerDebt = 0; \
+#define heaterPower(p) /*powerDebt = 0;*/ \
                        currPower = (p)
 #define button()       !(PIND & (1<<PD5))
 #define encA()         !(PIND & (1<<PD3))
@@ -128,8 +128,8 @@ void updateLCD(void){
 ISR (INT0_vect)
 {
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
-    if (powerDebt < 0)
-        powerDebt = 0;
+    /*if (powerDebt < 0)
+        powerDebt = 0;*/
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
             powerDebt -= TRIAC_MODULATOR_RESOLUTION;
@@ -268,7 +268,10 @@ int main(void)
     while (1) {
         currTemp = ds18b20_gettemp();
         if (currState == STATE_AUTO){
-            heaterPower(updatePID(currTemp, targetTemp));
+            if (totalPowerConsumed < (PREHEAT_ENERGY * (targetTemp - currTemp)))
+                heaterPower(TRIAC_MODULATOR_RESOLUTION); // initial temperature ramping up
+            else
+                heaterPower(updatePID(currTemp, targetTemp));
             if ((currPower < 0) ||
                 (currTemp > targetTemp + MAXIMUM_ALLOWED_OVERHEAT) ||
                 (currTemp > MAXIMUM_TEMPERATURE)){

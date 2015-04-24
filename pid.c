@@ -75,18 +75,13 @@ int updatePID(float temp, float target)
     derivative = derivative < PID_D_N_LIMIT ? PID_D_N_LIMIT : derivative;
     prevTemp = temp;
 
-    // turn off and reset PID in case of overheating
+    // turn off and reset PID in case of overheating (should not happen under normal workflow)
     if (error < -1 * PID_UPPER_REGULATION_LIMIT){
         resetPID(temp);
         return 0;
     }
 
-    // turn off PID in case of initial temperature ramping up
-    if (error > PREHEAT_OVERSHOT){
-        return TRIAC_MODULATOR_RESOLUTION;
-    }
-
-    // check if the temperature is changing too fast
+    // check if the temperature is not changing too fast
     if (fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE){
         return -1;
     }
