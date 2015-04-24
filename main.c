@@ -139,7 +139,7 @@ ISR (INT0_vect)
 }
 
 // Encoder processing
-ISR(INT1_vect)
+ISR (INT1_vect)
 {    
     if (encB()){
         if (currState == STATE_MANUAL){
@@ -182,7 +182,7 @@ ISR (TIMER1_COMPA_vect)
 }
 
 // Button processing
-ISR(TIMER0_OVF_vect) {
+ISR (TIMER0_OVF_vect) {
     if (button() && !buttonIsPressed){
         buttonIsPressed = 1;
         if (currState == STATE_OFF){
