@@ -64,8 +64,7 @@ float                   currTemp;
 char                    lcdBuf[2][20];
 state_t                 currState = STATE_OFF;
 int8_t                  cnt1 = 0;
-int8_t                  cnt2 = 0;
-int16_t                 cnt3 = 0;
+int16_t                 cnt2 = 0;
 uint32_t                totalPowerConsumed = 0;
 int16_t                 powerDebt = 0;
 uint16_t                secondsElapsed = 0;
@@ -168,7 +167,7 @@ ISR(INT1_vect)
 ISR (TIMER2_COMP_vect)
 {
     cnt2++;
-    if (cnt2 & (1 << 13))
+    if (cnt2 & (1 << 15))
         buzzerToggle();
 
 /*
