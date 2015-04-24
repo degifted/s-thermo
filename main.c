@@ -168,7 +168,7 @@ ISR(INT1_vect)
 ISR (TIMER2_COMP_vect)
 {
     cnt2++;
-    if (cnt2 & (1 << 12))
+    if (cnt2 & (1 << 13))
         buzzerToggle();
 
 /*
@@ -253,7 +253,7 @@ int main(void)
     TIMSK |= (1 << OCIE1A);
     TCCR1B |= (1 << CS11); 
 
-    OCR2 = 250;
+    OCR2 = 255;
     TCCR2 |= (1 << WGM21);
     TIMSK |= (1 << OCIE2);
 
