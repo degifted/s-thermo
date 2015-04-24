@@ -167,7 +167,7 @@ ISR(INT1_vect)
 ISR (TIMER2_COMP_vect)
 {
     cnt2++;
-    if (cnt2 & (1 << 15))
+    if (cnt2 & (1 << 14))
         buzzerToggle();
 
 /*
