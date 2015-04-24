@@ -343,7 +343,7 @@ REMOVE = rm -f
 REMOVEDIR = rm -rf
 COPY = cp
 WINSHELL = cmd
-
+GIT = git
 
 # Define Messages
 # English
@@ -393,7 +393,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 all: begin gccversion sizebefore build sizeafter end
 
 # Change the build target to build a HEX file or a library.
-build: elf hex eep lss sym
+build: gitversion elf hex eep lss sym
 #build: lib
 
 
@@ -612,3 +612,7 @@ $(shell mkdir $(OBJDIR) 2>/dev/null)
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
 build elf hex eep lss sym coff extcoff \
 clean clean_list program debug gdb-config
+
+gitversion:	version.h
+	$(shell git commit -am "auto commit by make")
+	@echo -ne "#define GIT_VERSION     \"$$(git rev-parse --short=8 HEAD)\""> version.h

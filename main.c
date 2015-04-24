@@ -36,45 +36,92 @@
 #include "lcd.h"
 #include "ds18b20.h"
 #include "pid.h"
+#include "config.h"
+#include "version.h"
 
+#define buzzerToggle() PORTB ^= _BV(1)
+#define buzzerOff()    PORTB &= ~_BV(1)
+#define beeperOn()     TCCR2 |= (1 << CS21)
+#define beeperOff()    TCCR2 &= ~(1 << CS21); \
+                       buzzerOff()
+#define heaterOn()     PORTD |= _BV(0)
+#define heaterOff()    PORTD &= ~_BV(0)
+#define heaterPower(p) powerDebt = 0; \
+                       currPower = (p)
+#define button()       !(PIND & (1<<PD5))
+#define encA()         !(PIND & (1<<PD3))
+#define encB()         !(PIND & (1<<PD4))
 
-#define TRIAC_MODULATOR_RESOLUTION  200
+typedef enum {          STATE_OFF,
+                        STATE_AUTO,
+                        STATE_MANUAL,
+                        STATE_FAILURE,
+                        //STATE_SELECT_PRESET,
+                        STATE_SYSTEMINFO
+            } state_t;
 
-
-#define buzzer_toggle() PORTB ^= _BV(1)
-#define buzzer_off()    PORTB &= ~_BV(1)
-#define beeper_on()     TCCR2 |= (1 << CS21)
-#define beeper_off()    TCCR2 &= ~(1 << CS21); \
-                        buzzer_off()
-#define heater_on()     PORTD |= _BV(0)
-#define heater_off()    PORTD &= ~_BV(0)
-#define heater_power(p) powerDebt = 0; \
-                        currPower = (p)
-#define button()        !(PIND & (1<<PD5))
-#define enc_A()         !(PIND & (1<<PD3))
-#define enc_B()         !(PIND & (1<<PD4))
-
-volatile float          currTemp;
-volatile uint8_t        targetTemp;
-uint8_t EEMEM           NonVolatileTargetTemp = 60;
-char                    lcdBuf[50];
-char const              *msg = "Off     ";
+volatile int8_t         targetTemp;
+float                   currTemp;
+char                    lcdBuf[2][20];
+state_t                 currState = STATE_OFF;
 int8_t                  cnt1 = 0;
 int8_t                  cnt2 = 0;
 int16_t                 cnt3 = 0;
+uint32_t                totalPowerConsumed = 0;
 int16_t                 powerDebt = 0;
 uint16_t                secondsElapsed = 0;
-int16_t                 currPower = -1;
+int16_t                 currPower = 0;
 uint8_t                 buttonIsPressed = 0;
-int                     currTempRounded;
+
+uint8_t EEMEM           NonVolatileTargetTemp = 57;
+
+
 
 void updateLCD(void){
+
+    sprintf(lcdBuf[0], "%dC%3d.%d",
+        targetTemp,
+        (int)currTemp,
+        (int)((float)(currTemp - (int)currTemp) * 10));
+
+
+    switch (currState){
+        case STATE_MANUAL:
+            sprintf(lcdBuf[0], "M%5d.%d",
+                (int)currTemp,
+                (int)((float)(currTemp - (int)currTemp) * 10));
+            sprintf(lcdBuf[1], "%-5d%3d",
+                (int)totalPowerConsumed, currPower);
+            break;
+
+        case STATE_SYSTEMINFO:
+            sprintf(lcdBuf[1], "%s",
+                GIT_VERSION);
+            break;
+
+        case STATE_AUTO:
+            sprintf(lcdBuf[1], "%d%c%02d %3d",
+                secondsElapsed / 3600,
+                secondsElapsed & 3 ? ':' : ' ',
+                (secondsElapsed / 60) % 60,
+                currPower);
+            break;
+
+        case STATE_FAILURE:
+            sprintf(lcdBuf[1], "FAILURE");
+            break;
+
+        case STATE_OFF:
+            sprintf(lcdBuf[1], "%-5dOFF",
+                (int)(totalPowerConsumed / TRIAC_MODULATOR_RESOLUTION));
+            break;
+    }
+
+    //lcd_clrscr();
     lcd_gotoxy(0, 0);
-    if (msg == (char*)"M")
-        sprintf(lcdBuf, "    %d.%d\nM    %03d", (int)currTemp, (int)((float)(currTemp - (int)currTemp) * 10), currPower);
-    else
-        sprintf(lcdBuf, "%dC %d.%d\n%s%d%c%02d %03d", targetTemp, (int)currTemp, (int)((float)(currTemp - (int)currTemp) * 10), msg, secondsElapsed / 3600, secondsElapsed & 3 ? ':' : ' ',  (secondsElapsed / 60) % 60, currPower);
-    lcd_puts(lcdBuf);
+    lcd_puts(lcdBuf[0]);
+    lcd_gotoxy(0, 1);
+    lcd_puts(lcdBuf[1]);
 }
 
 // Triac modulator
@@ -86,12 +133,13 @@ ISR (INT0_vect)
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
             powerDebt -= TRIAC_MODULATOR_RESOLUTION;
-            heater_off();
+            heaterOff();
         }else{
-            heater_on();
+            heaterOn();
+            totalPowerConsumed++;
         }
     } else {
-        heater_off();
+        heaterOff();
         powerDebt = 0;
     }
 }
@@ -99,20 +147,24 @@ ISR (INT0_vect)
 // Encoder processing
 ISR(INT1_vect)
 {    
-    if (enc_B()){
-        if (msg == (char*)"M"){
+    if (encB()){
+        if (currState == STATE_MANUAL){
             if (currPower > 0){
-                heater_power(currPower - 1);
+                heaterPower(currPower - 1);
             }
-        } else if (targetTemp > 25)
+        } else if (targetTemp > MINIMUM_TEMPERATURE){
             targetTemp--;
+            resetPID(currTemp);
+        }
     } else {
-        if (msg == (char*)"M"){
+        if (currState == STATE_MANUAL){
             if (currPower < TRIAC_MODULATOR_RESOLUTION){
-                heater_power(currPower + 1);
+                heaterPower(currPower + 1);
             }
-        } else if (targetTemp < 99)
+        } else if (targetTemp < MAXIMUM_TEMPERATURE){
             targetTemp++;
+            resetPID(currTemp);
+        }
     }
     updateLCD();
 }
@@ -125,7 +177,7 @@ ISR (TIMER2_COMP_vect)
     if (cnt2 == 10){
         cnt2 = 0;
         if (cnt3 & (1 << 12))
-            buzzer_toggle();
+            buzzerToggle();
     }
 }
 
@@ -144,46 +196,56 @@ ISR (TIMER1_COMPA_vect)
 ISR(TIMER0_OVF_vect) {
     if (button() && !buttonIsPressed){
         buttonIsPressed = 1;
-        if (msg == (char*)"Ready   "){
-            msg = "";
-            beeper_off();
-            secondsElapsed = 1;
-        } else if ((msg == (char*)"") || (msg == (char*)"M") || (msg == (char*)"Failure ") || (msg == (char*)"Preheat ") || (msg == (char*)"Cooling ")){
-            msg = "Off     ";
-            beeper_off();
-            secondsElapsed = 0;
-            heater_power(-1);
-        } else if (msg == (char*)"Off     "){
+        if (currState == STATE_OFF){
             if (NonVolatileTargetTemp != targetTemp)
                 eeprom_write_byte(&NonVolatileTargetTemp, targetTemp);
-            msg = "";
+            currState = STATE_AUTO;
+            secondsElapsed = 1;
+            totalPowerConsumed = 0;
+            heaterPower(0);
+            resetPID(currTemp);
+        } else {
+            currState = STATE_OFF;
+            beeperOff();
             secondsElapsed = 0;
-            heater_power(0);
-            pid_reset(currTemp);
+            heaterPower(-1);
         }
     } else if (!button() && buttonIsPressed){
         buttonIsPressed = 0;
     } else if (button() && buttonIsPressed){
-        if (msg != (char*)"M")
-            if (++buttonIsPressed == 100){
-                msg = "M";
-                heater_power(0);
+        if (buttonIsPressed < 255)
+            buttonIsPressed++;
+        if (buttonIsPressed == 100){
+            /*if (currState == STATE_SELECT_PRESET){
+                currState = STATE_OFF;
+            } else*/ {
+                secondsElapsed = 0;
+                totalPowerConsumed = 0;
+                currState = STATE_MANUAL;
+                heaterPower(0);
             }
+        }
+        if (buttonIsPressed == 200){
+            currState = STATE_SYSTEMINFO;
+        }
+        /*if (buttonIsPressed == 255){
+            currState = STATE_SELECT_PRESET;
+        }*/
     }
 }
 
 int main(void)
 {
-    PORTD |= (1<<PD3) | (1<<PD4) | (1<<PD5);
-    DDRD &= ~((1<<PD2) | (1<<PD3) | (1<<PD4) | (1<<PD5));
-    DDRB |= (1<<PB1);
-    DDRD |= (1<<PD0) | (1<<PD1);
+    PORTD |=  (1<<PD3) | (1<<PD4) | (1<<PD5);
     PORTD &= ~(1<<PD1);
+    DDRD  &= ~((1<<PD2) | (1<<PD3) | (1<<PD4) | (1<<PD5));
+    DDRD  |=  (1<<PD0) | (1<<PD1);
+    DDRB  |=  (1<<PB1);
 
     MCUCR = (1 << ISC11) | (1 << ISC01) | (1 << ISC00);
     GICR = (1 << INT1) | (1 << INT0);
 
-    TIMSK =1 <<TOIE0;
+    TIMSK = (1 <<TOIE0);
     TCCR0 = (1<<CS00) | (1<<CS02);
 
     OCR1A = 14999;
@@ -191,29 +253,13 @@ int main(void)
     TIMSK |= (1 << OCIE1A);
     TCCR1B |= (1 << CS11); 
 
-    OCR2 = 62;
+    OCR2 = 25;
     TCCR2 |= (1 << WGM21);
     TIMSK |= (1 << OCIE2);
-    //TCCR2 |= (1 << CS21);
 
-/*
-    OCR1A = 0x01FF;
-    // set PWM for 50% duty cycle @ 10bit
-
-    TCCR1A |= (1 << COM1A1);
-    // set none-inverting mode
-
-    TCCR1A |= (1 << WGM11) | (1 << WGM10);
-    // set 10bit phase corrected PWM Mode
-
-    TCCR1B |= (1 << CS11);
-    // set prescaler to 8 and starts PWM
-*/
-
-    wdt_enable(WDTO_1S);
+    wdt_enable(WDTO_2S);
 
     lcd_init(LCD_DISP_ON);
-    lcd_clrscr();
 
     targetTemp = eeprom_read_byte(&NonVolatileTargetTemp);
 
@@ -221,52 +267,18 @@ int main(void)
 
     while (1) {
         currTemp = ds18b20_gettemp();
-        currTempRounded = lround(currTemp);
-        if ((currTempRounded > targetTemp + 5) && (msg == (char*)"")){
-            if (secondsElapsed){
-                msg = "Failure ";
-                heater_power(-1);
-                beeper_on();
-            }else{
-                msg = "Cooling ";
-                heater_power(-1);
-            }
-        } else if ((currTempRounded < targetTemp - 4) && (msg == (char*)"")){
-            if (secondsElapsed){
-                msg = "Failure ";
-                heater_power(-1);
-                beeper_on();
-            }else{
-                msg = "Preheat ";
-                heater_power(255);
-            }
-        } else if (msg == (char*)"Cooling "){
-            msg = "Ready   ";
-            heater_power(0);
-            beeper_on();
-        } else if ((currTempRounded == targetTemp - 3) && ((msg == (char*)"Preheat "))){
-            msg = "Ready   ";
-            heater_power(0);
-            beeper_on();
-        } else if ((currTempRounded == targetTemp + 2) && ((msg == (char*)"Cooling "))){
-            msg = "Ready   ";
-            heater_power(0);
-            beeper_on();
-        } else if ((currTempRounded > targetTemp) && (msg == (char*)"Preheat ")){
-            msg = "Failure ";
-            heater_power(-1);
-            beeper_on();
-        } else if ((currTempRounded < targetTemp) && (msg == (char*)"Cooling ")){
-            msg = "Failure ";
-            heater_power(-1);
-            beeper_on();
-        } else if (!secondsElapsed && (msg == (char*)"")){
-            secondsElapsed = 1;
-        }
-        if ((currPower >= 0) && (currPower <= TRIAC_MODULATOR_RESOLUTION) && (msg != (char*)"M")){
-            heater_power(pid_update(currTemp, targetTemp) * TRIAC_MODULATOR_RESOLUTION);
-        }
+        if (currState == STATE_AUTO){
+            heaterPower(updatePID(currTemp, targetTemp));
+            if ((currPower < 0) ||
+                (currTemp > targetTemp + MAXIMUM_ALLOWED_OVERHEAT) ||
+                (currTemp > MAXIMUM_TEMPERATURE)){
 
+                currState = STATE_FAILURE;
+                secondsElapsed = 0;
+                heaterPower(-1);
+                beeperOn();
+            }
+        }
         updateLCD();
         wdt_reset();
     }

@@ -24,13 +24,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PID_H_
-#define PID_H_
-
-#include <stdint.h>
-
-void    resetPID(float temp);
-int     updatePID(float temp, float target);
-
-#endif
-
+#define     TRIAC_MODULATOR_RESOLUTION          100
+#define     PID_P                               6//2.6//0.026
+#define     PID_I                               0.014//0.014//0.00012
+#define     PID_D                               23//25//0.16
+#define     PID_A                               100
+#define     PID_D_WINDOW                        80//160
+#define     PID_I_P_LIMIT                       350
+#define     PID_I_N_LIMIT                      -350
+#define     PID_D_P_LIMIT                       1
+#define     PID_D_N_LIMIT                      -4
+#define     PID_INTEGRATOR_BAND                 2
+#define     PID_UPPER_REGULATION_LIMIT          1
+#define     PREHEAT_OVERSHOT                    10
+#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10
+#define     MAXIMUM_TEMPERATURE                 99
+#define     MINIMUM_TEMPERATURE                 20
+#define     MAXIMUM_ALLOWED_OVERHEAT            5

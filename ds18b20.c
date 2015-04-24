@@ -152,7 +152,7 @@ float ds18b20_gettemp() {
 	retd = digit + decimal * 0.0001;
 
 	//return previous value in case of insane result
-	if (prevTemp > 0 && (abs(retd - prevTemp) > 20))
+	if (prevTemp > 0 && (fabsf(retd - prevTemp) > 20))
 		return prevTemp;
 
 	prevTemp = retd;

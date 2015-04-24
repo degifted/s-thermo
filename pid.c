@@ -27,63 +27,85 @@
 
 #include <math.h>
 #include "pid.h"
+#include "config.h"
 
-const float k_p   = 0.0115;
-const float k_i   = 0.000045;
-const float k_d   = 0.175;
-#define k_delay 50
+float delayLine[PID_D_WINDOW];
+float integral;
+float prevTemp;
+uint8_t delayLineHeadIdx;
 
-float pid_prev[k_delay];
-float pid_int;
-
-uint8_t pid_prev_index;
-
-float pid_prev_update(float prev)
+float getDelayedValue(float prev)
 {
-    float popped = pid_prev[pid_prev_index];
-    pid_prev[pid_prev_index] = prev;
+    float popped = delayLine[delayLineHeadIdx];
+    delayLine[delayLineHeadIdx] = prev;
 
-    pid_prev_index++;
-    if(pid_prev_index >= k_delay)
-        pid_prev_index = 0;
+    delayLineHeadIdx++;
+    if(delayLineHeadIdx >= PID_D_WINDOW)
+        delayLineHeadIdx = 0;
 
     return popped;
 }
 
-void pid_reset(float temp)
+void resetPID(float temp)
 {
     uint8_t i;
     
-    for(i=0;i<k_delay;i++)
-        pid_prev[i] = temp;
+    for(i = 0; i < PID_D_WINDOW; i++)
+        delayLine[i] = temp;
 
-    pid_int = 0;
-    pid_prev_index = 0;
+    integral = 0;
+    delayLineHeadIdx = 0;
+    prevTemp = temp;
 }
 
 // PID algorithm based on information presented in Tim Wescott's "PID wihout a PhD" article
-float pid_update(float temp, float target)
+// Returns:
+//  0                                   ramping down
+//  TRIAC_MODULATOR_RESOLUTION          ramping up
+//  >0..<TRIAC_MODULATOR_RESOLUTION     continuous PID regulation
+//  -1                                  regulation error
+int updatePID(float temp, float target)
 {
-    float error, derivative;
-    float command;
+    float error, derivative, output;
 
-    error       = target - temp;
-    derivative  = pid_prev_update(temp) - temp;
+    error = target - temp;
+    prevTemp = (temp + prevTemp) / 2; // apply simple moving average LPF filter
+    derivative = getDelayedValue(prevTemp) - prevTemp;
+    derivative = derivative > PID_D_P_LIMIT ? PID_D_P_LIMIT : derivative;
+    derivative = derivative < PID_D_N_LIMIT ? PID_D_N_LIMIT : derivative;
+    prevTemp = temp;
 
-    command     = error      * k_p;
-    command    += pid_int    * k_i;
-    command    += derivative * k_d;
+    // turn off and reset PID in case of overheating
+    if (error < -1 * PID_UPPER_REGULATION_LIMIT){
+        resetPID(temp);
+        return 0;
+    }
 
-    //printf("p=%f, i=%f, d=%f, error=%f\n", error      * k_p, pid_int    * k_i, derivative * k_d, error);
+    // turn off PID in case of initial temperature ramping up
+    if (error > PREHEAT_OVERSHOT){
+        return TRIAC_MODULATOR_RESOLUTION;
+    }
 
-    // only update integral if output is not saturated (or if change would reduce saturation)
-    if( (command >= 0 && command <= 1) || (command > 0 && error < 0) || (command < 0 && error > 0) )
-        pid_int     += error;
+    // check if the temperature is changing too fast
+    if (fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE){
+        return -1;
+    }
 
-    if(command < 0)
-        command     = 0;
-    else if(command > 1)
-        command     = 1;
+    // only use integral if PD regulation is settled down 
+    if (fabsf(error) < PID_INTEGRATOR_BAND){
+        integral += error;
+        integral = integral > PID_I_P_LIMIT ? PID_I_P_LIMIT : integral;
+        integral = integral < PID_I_N_LIMIT ? PID_I_N_LIMIT : integral;
+    }
 
-    return command;
+    output = (error       * PID_P
+            + integral    * PID_I
+            + derivative  * PID_D)
+                          / (PID_A / TRIAC_MODULATOR_RESOLUTION);
+
+    // apply output clipping
+    output = output < 0 ? 0 : output;
+    output = output > TRIAC_MODULATOR_RESOLUTION ? TRIAC_MODULATOR_RESOLUTION : output;
+
+    return lround(output);
 }

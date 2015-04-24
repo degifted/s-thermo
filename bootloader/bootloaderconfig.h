@@ -80,7 +80,7 @@ these macros are defined, the boot loader usees them.
 
 /* --------------------------- Functional Range ---------------------------- */
 
-#define BOOTLOADER_CAN_EXIT     1
+#define BOOTLOADER_CAN_EXIT     0
 /* If this macro is defined to 1, the boot loader command line utility can
  * initiate a reboot after uploading the FLASH when the "-r" command line
  * option is given. If you define it to 0 or leave it undefined, the "-r"
