@@ -248,14 +248,13 @@ int main(void)
         currTemp = ds18b20_gettemp();
         if (currState == STATE_AUTO){
             if (preheatPower > totalPowerConsumed){
-                heaterPower(TRIAC_MODULATOR_RESOLUTION); 
+                heaterPower(TRIAC_MODULATOR_RESOLUTION);       // preheat on maximum power
+                if (currTemp >= targetTemp)                    // that should not happen
+                    preheatPower = 0;
             } else {
                 heaterPower(updatePID(currTemp, targetTemp));
             }
-            if ((currPower < 0) ||
-                (currTemp > targetTemp + MAXIMUM_ALLOWED_OVERHEAT) ||
-                (currTemp > MAXIMUM_TEMPERATURE)){
-
+            if (currPower < 0){
                 currState = STATE_FAILURE;
                 secondsElapsed = 0;
                 heaterPower(-1);

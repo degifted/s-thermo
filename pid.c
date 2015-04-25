@@ -1,6 +1,5 @@
 /**
  * Copyright (c) 2015, Dmitriy Gorokh
- * Inspired by implementation of Daniel Strother < http://danstrother.com/ >
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -34,16 +33,12 @@ float integral;
 float prevTemp;
 uint8_t delayLineHeadIdx;
 
-float getDelayedValue(float prev)
+float getDelayedValue(float currValue)
 {
-    float popped = delayLine[delayLineHeadIdx];
-    delayLine[delayLineHeadIdx] = prev;
-
-    delayLineHeadIdx++;
-    if(delayLineHeadIdx >= PID_D_INTERVAL)
-        delayLineHeadIdx = 0;
-
-    return popped;
+    float delayedValue = delayLine[delayLineHeadIdx];
+    delayLine[delayLineHeadIdx++] = currValue;
+    delayLineHeadIdx %= PID_D_INTERVAL;
+    return delayedValue;
 }
 
 void resetPID(float temp)
@@ -58,7 +53,6 @@ void resetPID(float temp)
     prevTemp = temp;
 }
 
-// PID algorithm based on information presented in Tim Wescott's "PID wihout a PhD" article
 // Returns:
 //  0                                   ramping down
 //  TRIAC_MODULATOR_RESOLUTION          ramping up
@@ -74,8 +68,13 @@ int updatePID(float temp, float target)
     prevTemp = (temp + prevTemp) / 2;
     derivative = getDelayedValue(prevTemp) - prevTemp;
 
-    // check if the temperature is not changing too fast
-    if (fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE){
+    // check if current temperature:
+    //  - is not changing too fast
+    //  - do not exceed maximum allowed overheat
+    //  - is withing regulation limits
+    if ((fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE) ||
+        (currTemp > targetTemp + MAXIMUM_ALLOWED_OVERHEAT) ||
+        (currTemp > MAXIMUM_TEMPERATURE)){
         return -1;
     }
 
