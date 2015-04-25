@@ -47,7 +47,7 @@
 #define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10          // Maximum allowed speed of temperature change.
                                                             // If the temperature is changing too fast,
                                                             // there is something wrong with the setup.
-#define     MAXIMUM_TEMPERATURE                 99
-#define     MINIMUM_TEMPERATURE                 20          // Temperature limits for the set point.
+#define     MAXIMUM_TEMPERATURE                 99          // Temperature limits for the set point.
+#define     MINIMUM_TEMPERATURE                 20
 #define     MAXIMUM_ALLOWED_OVERHEAT            5           // If the temperature goes beyond that limit,
                                                             // the regulation process must be aborted.
