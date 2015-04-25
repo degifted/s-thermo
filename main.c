@@ -55,7 +55,6 @@ typedef enum {          STATE_OFF,
                         STATE_AUTO,
                         STATE_MANUAL,
                         STATE_FAILURE,
-                        //STATE_SELECT_PRESET,
                         STATE_SYSTEMINFO
             } state_t;
 
@@ -66,6 +65,7 @@ state_t                 currState = STATE_OFF;
 int8_t                  cnt1 = 0;
 int16_t                 cnt2 = 0;
 uint32_t                totalPowerConsumed = 0;
+int16_t                 preheatPower = 0;
 int16_t                 powerDebt = 0;
 uint16_t                secondsElapsed = 0;
 int16_t                 currPower = 0;
@@ -190,6 +190,7 @@ ISR (TIMER0_OVF_vect) {
             currState = STATE_AUTO;
             secondsElapsed = 1;
             totalPowerConsumed = 0;
+            preheatPower = (targetTemp - currTemp > PREHEAT_THRESHOLD) ? (PREHEAT_ENERGY * (targetTemp - currTemp)) : 0;
             heaterPower(0);
             resetPID(currTemp);
         } else {
@@ -204,21 +205,14 @@ ISR (TIMER0_OVF_vect) {
         if (buttonIsPressed < 255)
             buttonIsPressed++;
         if (buttonIsPressed == 100){
-            /*if (currState == STATE_SELECT_PRESET){
-                currState = STATE_OFF;
-            } else*/ {
-                secondsElapsed = 0;
-                totalPowerConsumed = 0;
-                currState = STATE_MANUAL;
-                heaterPower(0);
-            }
+            secondsElapsed = 0;
+            totalPowerConsumed = 0;
+            currState = STATE_MANUAL;
+            heaterPower(0);
         }
         if (buttonIsPressed == 200){
             currState = STATE_SYSTEMINFO;
         }
-        /*if (buttonIsPressed == 255){
-            currState = STATE_SELECT_PRESET;
-        }*/
     }
 }
 
@@ -253,10 +247,11 @@ int main(void)
     while (1) {
         currTemp = ds18b20_gettemp();
         if (currState == STATE_AUTO){
-            if (totalPowerConsumed < (PREHEAT_ENERGY * (targetTemp - currTemp)))
-                heaterPower(TRIAC_MODULATOR_RESOLUTION); // initial temperature ramping up
-            else
+            if (preheatPower > totalPowerConsumed){
+                heaterPower(TRIAC_MODULATOR_RESOLUTION); 
+            } else {
                 heaterPower(updatePID(currTemp, targetTemp));
+            }
             if ((currPower < 0) ||
                 (currTemp > targetTemp + MAXIMUM_ALLOWED_OVERHEAT) ||
                 (currTemp > MAXIMUM_TEMPERATURE)){

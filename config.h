@@ -30,9 +30,11 @@
 #define     PREHEAT_ENERGY                      800         // Amount of energy for preheat
                                                             // per each degree of an error.
                                                             // 800 means 8 seconds of full power per each degree.
+#define     PREHEAT_THRESHOLD                   10          // Minimum difference between target and current
+                                                            // temperature at which the preheat starts.
 #define     PID_A                               100         // PID output attenuation (a reciprocal to gain).
 #define     PID_P                               6           // PID proportional coefficient.
-#define     PID_I                               0.015       // PID integral coefficient.
+#define     PID_I                               0.016       // PID integral coefficient.
 #define     PID_D                               24          // PID derivative coefficient.
 #define     PID_D_INTERVAL                      160         // PID time interval on which the derivative
                                                             // is calculated. 160 × 0.76 ÷ 60 = 2 minutes
@@ -44,7 +46,7 @@
                                                             // integrator starts working.
 #define     PID_UPPER_REGULATION_LIMIT          1           // PID maximum negative error, beyond which
                                                             // the PID regulator is switched off (abnormal situation).
-#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     10          // Maximum allowed speed of temperature change.
+#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     15          // Maximum allowed speed of temperature change.
                                                             // If the temperature is changing too fast,
                                                             // there is something wrong with the setup.
 #define     MAXIMUM_TEMPERATURE                 95          // Temperature limits for the set point.
