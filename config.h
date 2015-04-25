@@ -46,9 +46,9 @@
                                                             // integrator starts working.
 #define     PID_UPPER_REGULATION_LIMIT          1           // PID maximum negative error, beyond which
                                                             // the PID regulator is switched off (abnormal situation).
-#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     20          // Maximum allowed speed of temperature change.
-                                                            // If the temperature is changing too fast,
-                                                            // there is something wrong with the setup.
+#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     20          // Maximum allowed speed of temperature change per
+                                                            // PID_D_INTERVAL. If the temperature is changing too
+                                                            // fast, there is something wrong with the setup.
 #define     MAXIMUM_TEMPERATURE                 95          // Temperature limits for the set point.
 #define     MINIMUM_TEMPERATURE                 25
 #define     MAXIMUM_ALLOWED_OVERHEAT            5           // If the temperature goes beyond that limit,
