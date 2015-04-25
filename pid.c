@@ -69,8 +69,16 @@ int updatePID(float temp, float target)
     float error, derivative, output;
 
     error = target - temp;
-    prevTemp = (temp + prevTemp) / 2; // apply simple moving average LPF filter
+
+    // apply simple moving average LPF filter to the derivative
+    prevTemp = (temp + prevTemp) / 2;
     derivative = getDelayedValue(prevTemp) - prevTemp;
+
+    // check if the temperature is not changing too fast
+    if (fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE){
+        return -1;
+    }
+
     derivative = derivative > PID_D_P_LIMIT / PID_D ? PID_D_P_LIMIT / PID_D : derivative;
     derivative = derivative < PID_D_N_LIMIT / PID_D ? PID_D_N_LIMIT / PID_D : derivative;
     prevTemp = temp;
@@ -79,11 +87,6 @@ int updatePID(float temp, float target)
     if (error < -1 * PID_UPPER_REGULATION_LIMIT){
         resetPID(temp);
         return 0;
-    }
-
-    // check if the temperature is not changing too fast
-    if (fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE){
-        return -1;
     }
 
     // only use integral if PD regulation is settled down 
