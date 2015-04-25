@@ -71,8 +71,8 @@ int updatePID(float temp, float target)
     error = target - temp;
     prevTemp = (temp + prevTemp) / 2; // apply simple moving average LPF filter
     derivative = getDelayedValue(prevTemp) - prevTemp;
-    derivative = derivative > PID_D_P_LIMIT ? PID_D_P_LIMIT : derivative;
-    derivative = derivative < PID_D_N_LIMIT ? PID_D_N_LIMIT : derivative;
+    derivative = derivative > PID_D_P_LIMIT / PID_D ? PID_D_P_LIMIT / PID_D : derivative;
+    derivative = derivative < PID_D_N_LIMIT / PID_D ? PID_D_N_LIMIT / PID_D : derivative;
     prevTemp = temp;
 
     // turn off and reset PID in case of overheating (should not happen under normal workflow)
@@ -89,8 +89,8 @@ int updatePID(float temp, float target)
     // only use integral if PD regulation is settled down 
     if (fabsf(error) < PID_INTEGRATOR_BAND){
         integral += error;
-        integral = integral > PID_I_P_LIMIT ? PID_I_P_LIMIT : integral;
-        integral = integral < PID_I_N_LIMIT ? PID_I_N_LIMIT : integral;
+        integral = integral > PID_I_P_LIMIT / PID_I ? PID_I_P_LIMIT / PID_I : integral;
+        integral = integral < PID_I_N_LIMIT / PID_I ? PID_I_N_LIMIT / PID_I : integral;
     }
 
     output = (error       * PID_P

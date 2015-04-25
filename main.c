@@ -173,8 +173,7 @@ ISR (TIMER2_COMP_vect)
 // Realtime clock
 ISR (TIMER1_COMPA_vect)
 {
-    cnt1++;
-    if (cnt1 == 100)
+    if (cnt1++ == 100)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
         secondsElapsed++;

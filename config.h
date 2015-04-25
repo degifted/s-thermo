@@ -36,10 +36,10 @@
 #define     PID_A                               100         // PID output attenuation (a reciprocal to gain).
 #define     PID_D_INTERVAL                      160         // PID time interval on which a derivative
                                                             // is calculated. 160 × 0.76 ÷ 60 = 2 minutes
-#define     PID_I_P_LIMIT                       350         // Upper and lower limits of the integral and
-#define     PID_I_N_LIMIT                      -350         // derivative components. Beyond these limits
-#define     PID_D_P_LIMIT                       1           // the corresponding value is saturated.
-#define     PID_D_N_LIMIT                      -4           
+#define     PID_I_P_LIMIT                       5           // Upper and lower limits of the integral and
+#define     PID_I_N_LIMIT                      -5           // derivative components. Beyond these limits
+#define     PID_D_P_LIMIT                       10          // the corresponding value is saturated.
+#define     PID_D_N_LIMIT                      -50           
 #define     PID_INTEGRATOR_BAND                 2           // PID error boundaries inside which the
                                                             // integrator starts working.
 #define     PID_UPPER_REGULATION_LIMIT          1           // PID maximum negative error, beyond which
