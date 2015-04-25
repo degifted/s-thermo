@@ -41,16 +41,16 @@ float getDelayedValue(float currValue)
     return delayedValue;
 }
 
-void resetPID(float temp)
+void resetPID(float currTemp)
 {
     uint8_t i;
     
     for(i = 0; i < PID_D_INTERVAL; i++)
-        delayLine[i] = temp;
+        delayLine[i] = currTemp;
 
     integral = 0;
     delayLineHeadIdx = 0;
-    prevTemp = temp;
+    prevTemp = currTemp;
 }
 
 // Returns:
@@ -58,33 +58,33 @@ void resetPID(float temp)
 //  TRIAC_MODULATOR_RESOLUTION          ramping up
 //  >0..<TRIAC_MODULATOR_RESOLUTION     continuous PID regulation
 //  -1                                  regulation error
-int updatePID(float temp, float target)
+int updatePID(float currTemp, float targetTemp)
 {
     float error, derivative, output;
 
-    error = target - temp;
+    error = targetTemp - currTemp;
 
     // apply simple moving average LPF filter to the derivative
-    prevTemp = (temp + prevTemp) / 2;
+    prevTemp = (currTemp + prevTemp) / 2;
     derivative = getDelayedValue(prevTemp) - prevTemp;
+    prevTemp = currTemp;
 
     // check if current temperature:
     //  - is not changing too fast
     //  - do not exceed maximum allowed overheat
     //  - is withing regulation limits
     if ((fabsf(derivative) > MAXIMUM_TEMPERATURE_CHANGE_RATE) ||
-        (currTemp > targetTemp + MAXIMUM_ALLOWED_OVERHEAT) ||
+        (error < -1 * MAXIMUM_ALLOWED_OVERHEAT) ||
         (currTemp > MAXIMUM_TEMPERATURE)){
         return -1;
     }
 
     derivative = derivative > PID_D_P_LIMIT / PID_D ? PID_D_P_LIMIT / PID_D : derivative;
     derivative = derivative < PID_D_N_LIMIT / PID_D ? PID_D_N_LIMIT / PID_D : derivative;
-    prevTemp = temp;
 
     // turn off and reset PID in case of overheating (should not happen under normal workflow)
     if (error < -1 * PID_UPPER_REGULATION_LIMIT){
-        resetPID(temp);
+        resetPID(currTemp);
         return 0;
     }
 

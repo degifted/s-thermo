@@ -29,8 +29,8 @@
 
 #include <stdint.h>
 
-void    resetPID(float temp);
-int     updatePID(float temp, float target);
+void    resetPID(float currTemp);
+int     updatePID(float currTemp, float targetTemp);
 
 #endif
 
