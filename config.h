@@ -27,8 +27,9 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define     CFG_PRESET                          5        // 1 - hot plate
-                                                         // 2 - ...
+#define     CFG_PRESET                          1        // 1 - hot plate, 5 liter crock
+                                                         // 2 - immersion heater, 10 liter water bath
+                                                         // 3 - ...
 
 // Begin of default settings
 
