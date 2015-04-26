@@ -24,32 +24,50 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define     TRIAC_MODULATOR_RESOLUTION          100         // Resolution of the triac modulator
-                                                            // 100 means that power can be
-                                                            // regulated in 1% steps.
-#define     PREHEAT_ENERGY                      700         // Amount of energy for preheat
-                                                            // per each degree of an error.
-                                                            // 700 means 7 seconds of full power per each degree.
-#define     PREHEAT_THRESHOLD                   10          // Minimum difference between target and current
-                                                            // temperature at which the preheat starts.
-#define     PID_A                               100         // PID output attenuation (a reciprocal to gain).
-#define     PID_P                               6           // PID proportional coefficient.
-#define     PID_I                               0.016       // PID integral coefficient.
-#define     PID_D                               23          // PID derivative coefficient.
-#define     PID_D_INTERVAL                      118         // PID time interval on which the derivative
-                                                            // is calculated. 118 × 0.76 ÷ 60 = 1.5 minutes
-#define     PID_I_P_LIMIT                       5           // Upper and lower limits of the integral and
-#define     PID_I_N_LIMIT                      -5           // derivative components. Beyond these limits
-#define     PID_D_P_LIMIT                       10          // the corresponding value is saturated.
-#define     PID_D_N_LIMIT                      -60           
-#define     PID_INTEGRATOR_BAND                 2           // PID error boundaries inside which the
-                                                            // integrator starts working.
-#define     PID_UPPER_REGULATION_LIMIT          1           // PID maximum negative error, beyond which
-                                                            // the PID regulator is switched off (abnormal situation).
-#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     20          // Maximum allowed speed of temperature change per
-                                                            // PID_D_INTERVAL. If the temperature is changing too
-                                                            // fast, there is something wrong with the setup.
-#define     MAXIMUM_TEMPERATURE                 95          // Temperature limits for the set point.
+#ifndef CONFIG_H_
+#define CONFIG_H_
+
+#define     PRESET_NAME                         "hot plate"
+
+// Begin of default settings
+
+#define     TRIAC_MODULATOR_RESOLUTION          100      // Resolution of the triac modulator
+                                                         // 100 means that power can be
+                                                         // regulated in 1% steps.
+#define     PREHEAT_ENERGY                      700      // Amount of energy for preheat
+                                                         // per each degree of an error.
+                                                         // 700 means 7 seconds of full power per each degree.
+#define     PREHEAT_START_THRESHOLD             7        // Minimum difference between target and current
+                                                         // temperature at which the preheat starts.
+#define     PREHEAT_STOP_THRESHOLD              3        // A safety threshold of the error at which
+                                                         // the preheat switches off (abnormal situation).
+#define     PID_A                               100      // PID output attenuation (a reciprocal to gain).
+#define     PID_P                               6        // PID proportional coefficient.
+#define     PID_I                               0.016    // PID integral coefficient.
+#define     PID_D                               23       // PID derivative coefficient.
+#define     PID_D_INTERVAL                      118      // PID time interval on which the derivative
+                                                         // is calculated. 118 × 0.76 ÷ 60 = 1.5 minutes
+#define     PID_I_P_LIMIT                       5        // Upper and lower limits of the integral and
+#define     PID_I_N_LIMIT                      -5        // derivative components. Beyond these limits
+#define     PID_D_P_LIMIT                       10       // the corresponding value is saturated.
+#define     PID_D_N_LIMIT                      -60        
+#define     PID_INTEGRATOR_BAND                 2        // PID error boundaries inside which the
+                                                         // integrator starts working.
+#define     PID_UPPER_REGULATION_LIMIT          1        // PID maximum negative error, beyond which
+                                                         // the PID regulator is switched off (abnormal situation).
+#define     MAXIMUM_TEMPERATURE_CHANGE_RATE     20       // Maximum allowed speed of temperature change per
+                                                         // PID_D_INTERVAL. If the temperature is changing too
+                                                         // fast, there is something wrong with the setup.
+#define     MAXIMUM_TEMPERATURE                 95       // Temperature limits for the set point.
 #define     MINIMUM_TEMPERATURE                 25
-#define     MAXIMUM_ALLOWED_OVERHEAT            5           // If the temperature goes beyond that limit,
-                                                            // the regulation process must be aborted.
+#define     MAXIMUM_ALLOWED_OVERHEAT            5        // If the temperature goes beyond that limit,
+                                                         // the regulation process must be aborted.
+// End of default settings
+
+#ifdef PRESET_NAME == "hot plate"
+#elif PRESET_NAME == "123"
+#else
+ #error "Invalid preset"
+#endif
+
+#endif

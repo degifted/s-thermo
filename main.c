@@ -190,7 +190,7 @@ ISR (TIMER0_OVF_vect) {
             currState = STATE_AUTO;
             secondsElapsed = 1;
             totalPowerConsumed = 0;
-            preheatPower = (targetTemp - currTemp > PREHEAT_THRESHOLD) ? (PREHEAT_ENERGY * (targetTemp - currTemp)) : 0;
+            preheatPower = (targetTemp - currTemp > PREHEAT_START_THRESHOLD) ? (PREHEAT_ENERGY * (targetTemp - currTemp)) : 0;
             heaterPower(0);
             resetPID(currTemp);
         } else {
@@ -248,8 +248,8 @@ int main(void)
         currTemp = ds18b20_gettemp();
         if (currState == STATE_AUTO){
             if (preheatPower > totalPowerConsumed){
-                heaterPower(TRIAC_MODULATOR_RESOLUTION);       // preheat on maximum power
-                if (currTemp >= targetTemp)                    // that should not happen
+                heaterPower(TRIAC_MODULATOR_RESOLUTION);                 // preheat on maximum power
+                if (currTemp + PREHEAT_STOP_THRESHOLD > targetTemp)      // that should not happen
                     preheatPower = 0;
             } else {
                 heaterPower(updatePID(currTemp, targetTemp));
