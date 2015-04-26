@@ -27,7 +27,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define     PRESET_NAME                         "hot plate"
+#define     CFG_PRESET                          1        // 1 - hot plate
+                                                         // 2 - ...
 
 // Begin of default settings
 
@@ -64,8 +65,8 @@
                                                          // the regulation process must be aborted.
 // End of default settings
 
-#ifdef (PRESET_NAME == "hot plate")
-#elif (PRESET_NAME == "123")
+#ifdef CFG_PRESET == 1
+#elif  CFG_PRESET == 2
 #else
  #error "Invalid preset"
 #endif
