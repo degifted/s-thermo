@@ -70,6 +70,8 @@
 
 #elif  CFG_PRESET == 2
 
+#define PREHEAT_ENERGY 700
+
 #elif  CFG_PRESET == 3
 
 #else
