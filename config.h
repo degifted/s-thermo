@@ -64,8 +64,8 @@
                                                          // the regulation process must be aborted.
 // End of default settings
 
-#ifdef PRESET_NAME == "hot plate"
-#elif PRESET_NAME == "123"
+#ifdef (PRESET_NAME == "hot plate")
+#elif (PRESET_NAME == "123")
 #else
  #error "Invalid preset"
 #endif
