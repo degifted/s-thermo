@@ -65,8 +65,12 @@
                                                          // the regulation process must be aborted.
 // End of default settings
 
-#ifdef CFG_PRESET == 1
+#if    CFG_PRESET == 1
+
 #elif  CFG_PRESET == 2
+
+#elif  CFG_PRESET == 3
+
 #else
  #error "Invalid preset"
 #endif

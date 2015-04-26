@@ -91,6 +91,8 @@ void updateLCD(void){
             break;
 
         case STATE_SYSTEMINFO:
+            sprintf(lcdBuf[0], "preset: %d",
+                CFG_PRESET);
             sprintf(lcdBuf[1], "%s",
                 GIT_VERSION);
             break;
