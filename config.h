@@ -27,7 +27,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define     CFG_PRESET                          1        // 1 - hot plate
+#define     CFG_PRESET                          5        // 1 - hot plate
                                                          // 2 - ...
 
 // Begin of default settings
