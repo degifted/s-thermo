@@ -46,7 +46,8 @@
                         buzzerOff()
 #define heaterOn()      PORTD |= _BV(0)
 #define heaterOff()     PORTD &= ~_BV(0)
-#define heaterPower(p)  powerDebt=0;\ currPower = (p)
+#define heaterPower(p)  powerDebt=0;\
+ currPower = (p)
 #define button()        !(PIND & (1<<PD5))
 #define encA()          !(PIND & (1<<PD3))
 #define encB()          !(PIND & (1<<PD4))
