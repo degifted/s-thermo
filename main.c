@@ -46,7 +46,7 @@
                         buzzerOff()
 #define heaterOn()      PORTD |= _BV(0)
 #define heaterOff()     PORTD &= ~_BV(0)
-#define heaterPower(p)  currPower = (p)
+#define heaterPower(p)  powerDebt=0;\ currPower = (p)
 #define button()        !(PIND & (1<<PD5))
 #define encA()          !(PIND & (1<<PD3))
 #define encB()          !(PIND & (1<<PD4))
@@ -226,7 +226,7 @@ int main(void)
     DDRD  |=  (1<<PD0) | (1<<PD1);
     DDRB  |=  (1<<PB1);
 
-    MCUCR = (1 << ISC11) /*| (1 << ISC01) */| (1 << ISC00);
+    MCUCR = (1 << ISC11) | (1 << ISC01) | (1 << ISC00);
     GICR = (1 << INT1) | (1 << INT0);
 
     TIMSK = (1 <<TOIE0);
