@@ -36,7 +36,7 @@
 #define     TRIAC_MODULATOR_RESOLUTION          100      // Resolution of the triac modulator
                                                          // 100 means that power can be
                                                          // regulated in 1% steps.
-#define     PREHEAT_ENERGY                      700      // Amount of energy for preheat
+#define     PREHEAT_ENERGY                      800      // Amount of energy for preheat
                                                          // per each degree of an error.
                                                          // 700 means 7 seconds of full power per each degree.
 #define     PREHEAT_START_THRESHOLD             7        // Minimum difference between target and current
@@ -44,9 +44,9 @@
 #define     PREHEAT_STOP_THRESHOLD              3        // A safety threshold of the error at which
                                                          // the preheat switches off (abnormal situation).
 #define     PID_A                               100      // PID output attenuation (a reciprocal to gain).
-#define     PID_P                               6        // PID proportional coefficient.
+#define     PID_P                               8        // PID proportional coefficient.
 #define     PID_I                               0.016    // PID integral coefficient.
-#define     PID_D                               23       // PID derivative coefficient.
+#define     PID_D                               24       // PID derivative coefficient.
 #define     PID_D_INTERVAL                      118      // PID time interval on which the derivative
                                                          // is calculated. 118 × 0.76 ÷ 60 = 1.5 minutes
 #define     PID_I_P_LIMIT                       5        // Upper and lower limits of the integral and
