@@ -125,7 +125,7 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
-    
+buzzerToggle();    
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
