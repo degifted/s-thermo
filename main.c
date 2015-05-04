@@ -125,6 +125,7 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
+/*    
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
@@ -138,6 +139,7 @@ ISR (INT0_vect)
         heaterOff();
         powerDebt = 0;
     }
+*/
 }
 
 // Encoder processing
@@ -175,6 +177,23 @@ ISR (TIMER2_COMP_vect)
 // Realtime clock
 ISR (TIMER1_COMPA_vect)
 {
+    powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
+    if (currPower > 0){
+        if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
+            powerDebt -= TRIAC_MODULATOR_RESOLUTION;
+            heaterOff();
+        }else{
+            heaterOn();
+            totalPowerConsumed++;
+        }
+    } else {
+        heaterOff();
+        powerDebt = 0;
+    }
+
+
+
+
     if (cnt1++ == 100)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
