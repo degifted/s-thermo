@@ -220,7 +220,7 @@ ISR (TIMER0_OVF_vect) {
 
 int main(void)
 {
-    PORTD |=  (1<<PD3) | (1<<PD4) | (1<<PD5);
+    PORTD |=  (1<<PD3) | (1<<PD4) | (1<<PD5)          | (1<<PD2);
     PORTD &= ~(1<<PD1);
     DDRD  &= ~((1<<PD2) | (1<<PD3) | (1<<PD4) | (1<<PD5));
     DDRD  |=  (1<<PD0) | (1<<PD1);
