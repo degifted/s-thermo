@@ -62,8 +62,9 @@ volatile int8_t         targetTemp;
 float                   currTemp;
 char                    lcdBuf[2][20];
 state_t                 currState = STATE_OFF;
-int8_t                  cnt1 = 0;
+uint8_t                 cnt1 = 0;
 int16_t                 cnt2 = 0;
+uint8_t                 cnt3 = 0;
 uint32_t                totalPowerConsumed = 0;
 int16_t                 preheatPower = 0;
 int16_t                 powerDebt = 0;
@@ -125,6 +126,9 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
+    if (cnt3 < 2)
+        return;
+    cnt3 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
@@ -175,7 +179,8 @@ ISR (TIMER2_COMP_vect)
 // Realtime clock
 ISR (TIMER1_COMPA_vect)
 {
-    if (cnt1++ == 100)
+    cnt3++;
+    if (cnt1++ == 240)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
         secondsElapsed++;
@@ -220,7 +225,7 @@ ISR (TIMER0_OVF_vect) {
 
 int main(void)
 {
-    PORTD |=  (1<<PD3) | (1<<PD4) | (1<<PD5)          | (1<<PD2);
+    PORTD |=  (1<<PD3) | (1<<PD4) | (1<<PD5);
     PORTD &= ~(1<<PD1);
     DDRD  &= ~((1<<PD2) | (1<<PD3) | (1<<PD4) | (1<<PD5));
     DDRD  |=  (1<<PD0) | (1<<PD1);
@@ -232,10 +237,10 @@ int main(void)
     TIMSK = (1 <<TOIE0);
     TCCR0 = (1<<CS00) | (1<<CS02);
 
-    OCR1A = 14999;
+    OCR1A = 49999;
     TCCR1B |= (1 << WGM12);
     TIMSK |= (1 << OCIE1A);
-    TCCR1B |= (1 << CS11); 
+    TCCR1B |= (1 << CS10); 
 
     OCR2 = 255;
     TCCR2 |= (1 << WGM21);
