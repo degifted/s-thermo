@@ -63,7 +63,7 @@ float                   currTemp;
 char                    lcdBuf[2][20];
 state_t                 currState = STATE_OFF;
 uint8_t                 cnt1 = 0;
-int16_t                 cnt2 = 0;
+uint16_t                cnt2 = 0;
 uint8_t                 cnt3 = 0;
 uint32_t                totalPowerConsumed = 0;
 int16_t                 preheatPower = 0;
@@ -179,7 +179,8 @@ ISR (TIMER2_COMP_vect)
 // Realtime clock
 ISR (TIMER1_COMPA_vect)
 {
-    cnt3++;
+    if (cnt3++ > 3)
+        heaterOff();
     if (cnt1++ == 240)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
