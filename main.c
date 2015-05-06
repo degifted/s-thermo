@@ -179,7 +179,7 @@ ISR (TIMER2_COMP_vect)
 // Realtime clock
 ISR (TIMER1_COMPA_vect)
 {
-    if (cnt3++ > 2)
+    if (cnt3++ > 1)
         heaterOff();
     if (cnt1++ == 240)
         cnt1 = 0;
