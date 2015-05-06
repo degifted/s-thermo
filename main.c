@@ -126,7 +126,7 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
-    if (cnt3 < 2) // debouncing of the zero crossing detector circuit
+    if (cnt3 < 3) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
@@ -179,8 +179,7 @@ ISR (TIMER2_COMP_vect)
 // Realtime clock
 ISR (TIMER1_COMPA_vect)
 {
-    if (cnt3++ > 1)
-        heaterOff();
+    cnt3++;
     if (cnt1++ == 240)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
