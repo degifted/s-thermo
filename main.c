@@ -87,8 +87,8 @@ void updateLCD(void){
             sprintf(lcdBuf[0], "M%5d.%d",
                 (int)currTemp,
                 (int)((float)(currTemp - (int)currTemp) * 10));
-            sprintf(lcdBuf[1], "%-5d%3d",
-                (int)totalPowerConsumed, currPower);
+            sprintf(lcdBuf[1], "%-5lu%3d",
+                totalPowerConsumed, currPower);
             break;
 
         case STATE_SYSTEMINFO:
@@ -126,7 +126,7 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
-    if (cnt3 < 2)
+    if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
