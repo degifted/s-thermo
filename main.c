@@ -126,7 +126,7 @@ void updateLCD(void){
 // Triac modulator
 ISR (INT0_vect)
 {
-    if (cnt3 < 3) // debouncing of the zero crossing detector circuit
+    if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
