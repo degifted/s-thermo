@@ -36,7 +36,7 @@
 #define     TRIAC_MODULATOR_RESOLUTION          100      // Resolution of the triac modulator
                                                          // 100 means that power can be
                                                          // regulated in 1% steps.
-#define     PREHEAT_ENERGY                      800      // Amount of energy for preheat
+#define     PREHEAT_ENERGY                      1000     // Amount of energy for preheat
                                                          // per each degree of an error.
                                                          // 700 means 7 seconds of full power per each degree.
 #define     PREHEAT_START_THRESHOLD             7        // Minimum difference between target and current
@@ -44,9 +44,9 @@
 #define     PREHEAT_STOP_THRESHOLD              3        // A safety threshold of the error at which
                                                          // the preheat switches off (abnormal situation).
 #define     PID_A                               100      // PID output attenuation (a reciprocal to gain).
-#define     PID_P                               7        // PID proportional coefficient.
-#define     PID_I                               0.015    // PID integral coefficient.
-#define     PID_D                               25       // PID derivative coefficient.
+#define     PID_P                               12       // PID proportional coefficient.
+#define     PID_I                               0.02     // PID integral coefficient.
+#define     PID_D                               30       // PID derivative coefficient.
 #define     PID_D_INTERVAL                      118      // PID time interval on which the derivative
                                                          // is calculated. 118 × 0.76 ÷ 60 = 1.5 minutes
 #define     PID_I_P_LIMIT                       5        // Upper and lower limits of the integral and
@@ -64,6 +64,9 @@
 #define     MINIMUM_TEMPERATURE                 25
 #define     MAXIMUM_ALLOWED_OVERHEAT            5        // If the temperature goes beyond that limit,
                                                          // the regulation process must be aborted.
+#define     ZERO_CROSSING_DETECTOR_EDGE         0        // Edge of zero crossing detector circuit
+                                                         // 0 -- negative edge
+                                                         // 1 -- positive edge
 // End of default settings
 
 #if    CFG_PRESET == 1
