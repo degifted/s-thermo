@@ -44,14 +44,14 @@
 #define     PREHEAT_STOP_THRESHOLD              3        // A safety threshold of the error at which
                                                          // the preheat switches off (abnormal situation).
 #define     PID_A                               100      // PID output attenuation (a reciprocal to gain).
-#define     PID_P                               12       // PID proportional coefficient.
-#define     PID_I                               0.02     // PID integral coefficient.
+#define     PID_P                               13       // PID proportional coefficient.
+#define     PID_I                               0.022    // PID integral coefficient.
 #define     PID_D                               30       // PID derivative coefficient.
 #define     PID_D_INTERVAL                      118      // PID time interval on which the derivative
                                                          // is calculated. 118 × 0.76 ÷ 60 = 1.5 minutes
 #define     PID_I_P_LIMIT                       5        // Upper and lower limits of the integral and
 #define     PID_I_N_LIMIT                      -5        // derivative components. Beyond these limits
-#define     PID_D_P_LIMIT                       10       // the corresponding value is saturated.
+#define     PID_D_P_LIMIT                       20       // the corresponding value is saturated.
 #define     PID_D_N_LIMIT                      -60        
 #define     PID_INTEGRATOR_BAND                 2        // PID error boundaries inside which the
                                                          // integrator starts working.
