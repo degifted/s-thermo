@@ -129,7 +129,7 @@ ISR (INT0_vect)
     if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
-    _delay_us(1);
+    _delay_us(100);
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
