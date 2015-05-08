@@ -72,13 +72,12 @@
 #if    CFG_PRESET == 1
 
 #elif  CFG_PRESET == 2
-
 #define PREHEAT_ENERGY 700
+#define ZERO_CROSSING_DETECTOR_EDGE 0
 
-#elif  CFG_PRESET == 3
 
 #else
- #error "Invalid preset"
+#error "Invalid preset"
 #endif
 
 #endif

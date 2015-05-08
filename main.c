@@ -129,6 +129,7 @@ ISR (INT0_vect)
     if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
+    _delay_us(1);
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
@@ -180,7 +181,7 @@ ISR (TIMER2_COMP_vect)
 ISR (TIMER1_COMPA_vect)
 {
     if (cnt3++ > 2)
-        heaterOff();
+        heaterOff(); // turn off heater in case we missed zero crossing event
     if (cnt1++ == 240)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
