@@ -180,6 +180,8 @@ ISR (TIMER2_COMP_vect)
 ISR (TIMER1_COMPA_vect)
 {
     cnt3++;
+    if (cnt3 > 1)
+        heaterOff();
     if (cnt1++ == 240)
         cnt1 = 0;
     if (secondsElapsed && !cnt1){
