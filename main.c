@@ -250,10 +250,10 @@ int main(void)
     MCUCR = (1 << ISC11) | (1 << ISC01) | (ZERO_CROSSING_DETECTOR_EDGE << ISC00);
     GICR = (1 << INT1) | (1 << INT0);
 
-    TCCR0 = (1<<CS00) | (1<<CS02);
+    TCCR0 = (1 << CS00) | (1 << CS02);          // Timer 0:  12MHz / 1024 / 256 = 45.78Hz = 21.85ms
 
     OCR1A = 49999;
-    TCCR1B = (1 << WGM12) | (1 << CS10);
+    TCCR1B = (1 << WGM12) | (1 << CS10);        // Timer 1:  12MHz / (49999 + 1) = 240Hz = 4.17ms
 
     OCR2 = ZERO_CROSSING_DETECTOR_DELAY;
 
