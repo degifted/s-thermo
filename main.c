@@ -131,8 +131,8 @@ ISR (INT0_vect)
     if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
-    TCNT2 = 0;
-    TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
+    //TCNT2 = 0;
+    //TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
 }
 
 // Triac modulator, phase shifter for triac modulator
