@@ -123,13 +123,20 @@ void updateLCD(void){
     lcd_puts(lcdBuf[1]);
 }
 
-// Triac modulator
+// Zero crossing detector
 ISR (INT0_vect)
 {
     if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
-    _delay_us(1000);
+    TCNT2 = 0;
+    TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
+}
+
+// Triac modulator, phase shifter for triac modulator and beeper
+ISR (TIMER2_COMP_vect)
+{
+    TCCR2 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
@@ -145,10 +152,16 @@ ISR (INT0_vect)
     }
 }
 
+
+// Beeper
 ISR (TIMER2_OVF_vect)
 {
-
+    if (cnt2++ & (1 << 10))
+        buzzerToggle();
 }
+
+
+
 // Encoder processing
 ISR (INT1_vect)
 {    
@@ -172,13 +185,6 @@ ISR (INT1_vect)
         }
     }
     updateLCD();
-}
-
-// Beeper
-ISR (TIMER2_COMP_vect)
-{
-    if (cnt2++ & (1 << 10))
-        buzzerToggle();
 }
 
 // Realtime clock
@@ -240,17 +246,19 @@ int main(void)
     MCUCR = (1 << ISC11) | (1 << ISC01) | (ZERO_CROSSING_DETECTOR_EDGE << ISC00);
     GICR = (1 << INT1) | (1 << INT0);
 
-    TIMSK = (1 <<TOIE0);
+    //TIMSK = (1 <<TOIE0);
     TCCR0 = (1<<CS00) | (1<<CS02);
 
     OCR1A = 49999;
-    TCCR1B |= (1 << WGM12);
-    TIMSK |= (1 << OCIE1A);
-    TCCR1B |= (1 << CS10); 
+    TCCR1B = (1 << WGM12) | (1 << CS10);
+    //TIMSK |= (1 << OCIE1A);
+    //TCCR1B |= (1 << CS10); 
 
-    OCR2 = 255;
-    TCCR2 |= (1 << WGM21);
-    TIMSK |= (1 << OCIE2);
+    //OCR2 = 255;
+    //TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22); //(1 << WGM21);
+    //TIMSK |= (1 << OCIE2);
+
+    TIMSK = (1 <<TOIE0) | (1 << OCIE1A) | (1 << OCIE2) | (1 << TOIE2);
 
     wdt_enable(WDTO_2S);
     lcd_init(LCD_DISP_ON);
