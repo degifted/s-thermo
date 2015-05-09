@@ -138,7 +138,7 @@ ISR (INT0_vect)
 // Triac modulator, phase shifter for triac modulator
 ISR (TIMER2_COMP_vect)
 {
-    TCCR2 = 0;
+//    TCCR2 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
