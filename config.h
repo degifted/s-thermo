@@ -64,7 +64,7 @@
 #define     MINIMUM_TEMPERATURE                 25
 #define     MAXIMUM_ALLOWED_OVERHEAT            5        // If the temperature goes beyond that limit,
                                                          // the regulation process must be aborted.
-#define     ZERO_CROSSING_DETECTOR_EDGE         0        // Edge of zero crossing detector circuit
+#define     ZERO_CROSSING_DETECTOR_EDGE         1        // Edge of zero crossing detector circuit
                                                          // 0 -- negative edge
                                                          // 1 -- positive edge
 #define     ZERO_CROSSING_DETECTOR_DELAY        58       // Delay of event from zero crossing detector
