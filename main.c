@@ -41,8 +41,10 @@
 
 #define buzzerToggle()  PORTB ^= _BV(1)
 #define buzzerOff()     PORTB &= ~_BV(1)
-#define beeperOn()      TCCR2 &= ~(1 << WGM21)
-#define beeperOff()     TCCR2 |= (1 << WGM21); \
+#define beeperOn()      TCCR2 = (1 << CS21); \
+                        GICR &= ~(1 << INT0)
+#define beeperOff()     TCCR2 = 0; \
+                        GICR |= (1 << INT0);
                         buzzerOff()
 #define heaterOn()      PORTD |= _BV(0)
 #define heaterOff()     PORTD &= ~_BV(0)
@@ -133,7 +135,7 @@ ISR (INT0_vect)
     TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
 }
 
-// Triac modulator, phase shifter for triac modulator and beeper
+// Triac modulator, phase shifter for triac modulator
 ISR (TIMER2_COMP_vect)
 {
     TCCR2 = 0;
