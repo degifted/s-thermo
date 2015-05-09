@@ -41,8 +41,8 @@
 
 #define buzzerToggle()  PORTB ^= _BV(1)
 #define buzzerOff()     PORTB &= ~_BV(1)
-#define beeperOn()      TCCR2 = (1 << CS21); \
-                        GICR &= ~(1 << INT0)
+#define beeperOn()      GICR &= ~(1 << INT0); \
+                        TCCR2 = (1 << CS21)
 #define beeperOff()     TCCR2 = 0; \
                         GICR |= (1 << INT0); \
                         buzzerOff()
@@ -256,7 +256,7 @@ int main(void)
     //TIMSK |= (1 << OCIE1A);
     //TCCR1B |= (1 << CS10); 
 
-    OCR2 = 1;//255;
+    OCR2 = 100;//255;
     //TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22); //(1 << WGM21);
     //TIMSK |= (1 << OCIE2);
 
