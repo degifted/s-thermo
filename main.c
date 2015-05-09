@@ -145,6 +145,10 @@ ISR (INT0_vect)
     }
 }
 
+ISR (TIMER2_OVF_vect)
+{
+
+}
 // Encoder processing
 ISR (INT1_vect)
 {    
