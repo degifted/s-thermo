@@ -44,7 +44,7 @@
 #define beeperOn()      TCCR2 = (1 << CS21); \
                         GICR &= ~(1 << INT0)
 #define beeperOff()     TCCR2 = 0; \
-                        GICR |= (1 << INT0);
+                        GICR |= (1 << INT0); \
                         buzzerOff()
 #define heaterOn()      PORTD |= _BV(0)
 #define heaterOff()     PORTD &= ~_BV(0)
