@@ -41,10 +41,12 @@
 
 #define buzzerToggle()  PORTB ^= _BV(1)
 #define buzzerOff()     PORTB &= ~_BV(1)
-#define beeperOn()      TIMSK &= ~(1 << OCIE2); \
+#define beeperOn()      GICR &= ~(1 << INT0); \
+                        TIMSK &= ~(1 << OCIE2); \
                         TCCR2 = (1 << CS21)
 #define beeperOff()     TCCR2 = 0; \
-                        TIMSK |= (1 << OCIE2); \
+                        GICR |= (1 << INT0); \
+                        TIMSK &= ~(1 << OCIE2); \
                         buzzerOff()
 #define heaterOn()      PORTD |= _BV(0)
 #define heaterOff()     PORTD &= ~_BV(0)
