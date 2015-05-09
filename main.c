@@ -39,44 +39,47 @@
 #include "config.h"
 #include "version.h"
 
-#define buzzerToggle()  PORTB ^= _BV(1)
-#define buzzerOff()     PORTB &= ~_BV(1)
-#define beeperOn()      GICR &= ~(1 << INT0); \
-                        TIMSK &= ~(1 << OCIE2); \
-                        TCCR2 = (1 << CS21)
-#define beeperOff()     TCCR2 = 0; \
-                        GICR |= (1 << INT0); \
-                        TIMSK |= (1 << OCIE2); \
-                        buzzerOff()
-#define heaterOn()      PORTD |= _BV(0)
-#define heaterOff()     PORTD &= ~_BV(0)
-#define heaterPower(p)  currPower = (p)
-#define button()        !(PIND & (1<<PD5))
-#define encA()          !(PIND & (1<<PD3))
-#define encB()          !(PIND & (1<<PD4))
+#define buzzerToggle()                  PORTB ^= (1 << PB1)
+#define buzzerOff()                     PORTB &= ~(1 << PB1)
+#define beeperOn()                      GICR &= ~(1 << INT0); \
+                                        TIMSK &= ~(1 << OCIE2); \
+                                        TCCR2 = (1 << CS21)
+#define beeperOff()                     TCCR2 = 0; \
+                                        GICR |= (1 << INT0); \
+                                        TIMSK |= (1 << OCIE2); \
+                                        buzzerOff()
+#define startTriacModulatorTimer()      TCNT2 = 0; \
+                                        TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21)
+#define stopTriacModulatorTimer()       TCCR2 = 0
+#define heaterOn()                      PORTD |= (1 << PD0)
+#define heaterOff()                     PORTD &= ~(1 << PD0)
+#define heaterPower(p)                  currPower = (p)
+#define button()                        !(PIND & (1 << PD5))
+#define encA()                          !(PIND & (1 << PD3))
+#define encB()                          !(PIND & (1 << PD4))
 
-typedef enum {          STATE_OFF,
-                        STATE_AUTO,
-                        STATE_MANUAL,
-                        STATE_FAILURE,
-                        STATE_SYSTEMINFO
+typedef enum {                          STATE_OFF,
+                                        STATE_AUTO,
+                                        STATE_MANUAL,
+                                        STATE_FAILURE,
+                                        STATE_SYSTEMINFO
             } state_t;
 
-volatile int8_t         targetTemp;
-float                   currTemp;
-char                    lcdBuf[2][20];
-state_t                 currState = STATE_OFF;
-uint8_t                 cnt1 = 0;
-uint16_t                cnt2 = 0;
-uint8_t                 cnt3 = 0;
-uint32_t                totalPowerConsumed = 0;
-int16_t                 preheatPower = 0;
-int16_t                 powerDebt = 0;
-uint16_t                secondsElapsed = 0;
-int16_t                 currPower = 0;
-uint8_t                 buttonIsPressed = 0;
+volatile int8_t                         targetTemp;
+float                                   currTemp;
+char                                    lcdBuf[2][20];
+state_t                                 currState               = STATE_OFF;
+uint8_t                                 cnt1                    = 0;
+uint16_t                                cnt2                    = 0;
+uint8_t                                 cnt3                    = 0;
+uint32_t                                totalPowerConsumed      = 0;
+int16_t                                 preheatPower            = 0;
+int16_t                                 powerDebt               = 0;
+uint16_t                                secondsElapsed          = 0;
+int16_t                                 currPower               = 0;
+uint8_t                                 buttonIsPressed         = 0;
 
-uint8_t EEMEM           NonVolatileTargetTemp = 57;
+uint8_t EEMEM                           NonVolatileTargetTemp   = 57;
 
 
 
@@ -133,14 +136,13 @@ ISR (INT0_vect)
     if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
-    TCNT2 = 0;
-    TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
+    startTriacModulatorTimer();
 }
 
 // Triac modulator and ZCD phase shifter
 ISR (TIMER2_COMP_vect)
 {
-    TCCR2 = 0;
+    stopTriacModulatorTimer();
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
@@ -210,7 +212,8 @@ ISR (TIMER0_OVF_vect) {
             currState = STATE_AUTO;
             secondsElapsed = 1;
             totalPowerConsumed = 0;
-            preheatPower = (targetTemp - currTemp > PREHEAT_START_THRESHOLD) ? (PREHEAT_ENERGY * (targetTemp - currTemp)) : 0;
+            preheatPower = (targetTemp - currTemp > PREHEAT_START_THRESHOLD) ?
+                            (PREHEAT_ENERGY * (targetTemp - currTemp)) : 0;
             heaterPower(0);
             resetPID(currTemp);
         } else {
