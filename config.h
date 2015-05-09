@@ -67,6 +67,8 @@
 #define     ZERO_CROSSING_DETECTOR_EDGE         0        // Edge of zero crossing detector circuit
                                                          // 0 -- negative edge
                                                          // 1 -- positive edge
+#define     ZERO_CROSSING_DETECTOR_DELAY        58       // Delay of event from zero crossing detector
+                                                         // 58 means (58 + 1) / (12MHz / 1024) = 5ms
 // End of default settings
 
 #if    CFG_PRESET == 1

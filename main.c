@@ -137,7 +137,7 @@ ISR (INT0_vect)
     TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
 }
 
-// Triac modulator, phase shifter for triac modulator
+// Triac modulator and ZCD phase shifter
 ISR (TIMER2_COMP_vect)
 {
     TCCR2 = 0;
@@ -156,15 +156,12 @@ ISR (TIMER2_COMP_vect)
     }
 }
 
-
 // Beeper
 ISR (TIMER2_OVF_vect)
 {
     if (cnt2++ & (1 << 10))
         buzzerToggle();
 }
-
-
 
 // Encoder processing
 ISR (INT1_vect)
@@ -250,17 +247,12 @@ int main(void)
     MCUCR = (1 << ISC11) | (1 << ISC01) | (ZERO_CROSSING_DETECTOR_EDGE << ISC00);
     GICR = (1 << INT1) | (1 << INT0);
 
-    //TIMSK = (1 <<TOIE0);
     TCCR0 = (1<<CS00) | (1<<CS02);
 
     OCR1A = 49999;
     TCCR1B = (1 << WGM12) | (1 << CS10);
-    //TIMSK |= (1 << OCIE1A);
-    //TCCR1B |= (1 << CS10); 
 
-    OCR2 = 100;//255;
-    //TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22); //(1 << WGM21);
-    //TIMSK |= (1 << OCIE2);
+    OCR2 = ZERO_CROSSING_DETECTOR_DELAY;
 
     TIMSK = (1 <<TOIE0) | (1 << OCIE1A) | (1 << OCIE2) | (1 << TOIE2);
 
