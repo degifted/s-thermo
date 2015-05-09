@@ -41,10 +41,10 @@
 
 #define buzzerToggle()  PORTB ^= _BV(1)
 #define buzzerOff()     PORTB &= ~_BV(1)
-#define beeperOn()      GICR &= ~(1 << INT0); \
+#define beeperOn()      TIMSK &= ~(1 << OCIE2); \
                         TCCR2 = (1 << CS21)
 #define beeperOff()     TCCR2 = 0; \
-                        GICR |= (1 << INT0); \
+                        TIMSK |= (1 << OCIE2); \
                         buzzerOff()
 #define heaterOn()      PORTD |= _BV(0)
 #define heaterOff()     PORTD &= ~_BV(0)
@@ -131,14 +131,14 @@ ISR (INT0_vect)
     if (cnt3 < 2) // debouncing of the zero crossing detector circuit
         return;
     cnt3 = 0;
-    //TCNT2 = 0;
-    //TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
+    TCNT2 = 0;
+    TCCR2 = (1 << CS20) | (1 << CS21) | (1 << CS22) | (1 << WGM21); // run Timer2
 }
 
 // Triac modulator, phase shifter for triac modulator
 ISR (TIMER2_COMP_vect)
 {
-//    TCCR2 = 0;
+    TCCR2 = 0;
     powerDebt += TRIAC_MODULATOR_RESOLUTION - currPower;
     if (currPower > 0){
         if (powerDebt >= TRIAC_MODULATOR_RESOLUTION){
