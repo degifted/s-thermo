@@ -39,14 +39,14 @@
 #define     PREHEAT_ENERGY                      1000     // Amount of energy for preheat
                                                          // per each degree of an error.
                                                          // 700 means 7 seconds of full power per each degree.
-#define     PREHEAT_START_THRESHOLD             9        // Minimum difference between target and current
+#define     PREHEAT_START_THRESHOLD             10       // Minimum difference between target and current
                                                          // temperature at which the preheat starts.
-#define     PREHEAT_STOP_THRESHOLD              5        // A safety threshold of the error at which
+#define     PREHEAT_STOP_THRESHOLD              6        // A safety threshold of the error at which
                                                          // the preheat switches off (abnormal situation).
 #define     PID_A                               100      // PID output attenuation (a reciprocal to gain).
 #define     PID_P                               13       // PID proportional coefficient.
 #define     PID_I                               0.022    // PID integral coefficient.
-#define     PID_D                               30       // PID derivative coefficient.
+#define     PID_D                               33       // PID derivative coefficient.
 #define     PID_D_INTERVAL                      118      // PID time interval on which the derivative
                                                          // is calculated. 118 × 0.76 ÷ 60 = 1.5 minutes
 #define     PID_I_P_LIMIT                       5        // Upper and lower limits of the integral and
